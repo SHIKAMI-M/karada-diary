@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#5b7c99">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="からだの記録">
+<link rel="manifest" href="manifest.webmanifest">
+<title>からだの記録</title>
+<style>
+:root{--bg:#f3f6f8;--card:#fff;--line:#dce3e8;--text:#26313a;--muted:#6d7982;--accent:#5b7c99;--warn:#fff2d9;--danger:#fde8e8;--ok:#eaf6ee}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP","Yu Gothic",sans-serif}
+header{background:var(--card);padding:18px 16px 14px;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+h1{font-size:22px;margin:0 0 3px}.sub{font-size:12px;color:var(--muted)}
+main{max-width:820px;margin:auto;padding:12px}
+.card{background:var(--card);border-radius:16px;padding:16px;margin:12px 0;box-shadow:0 2px 10px #26313a0b}
+h2{font-size:17px;margin:0 0 13px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.field label,.section-title{font-size:12px;color:var(--muted);font-weight:700}
+input,select,textarea{width:100%;margin-top:5px;padding:10px 11px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--text);font-size:16px}
+textarea{resize:vertical}
+.group{border-top:1px solid var(--line);padding-top:13px;margin-top:15px}.group:first-child{border-top:0;padding-top:0;margin-top:0}
+.options{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:7px}
+.opt input{display:none}.opt span{display:block;text-align:center;padding:9px 5px;border:1px solid var(--line);border-radius:10px;background:#fff;font-size:13px}
+.opt input:checked+span{background:#e8f0f6;border-color:var(--accent);font-weight:700}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+button{border:0;border-radius:11px;padding:11px 14px;font-size:15px;font-weight:700;background:#e9eef2;color:var(--text)}
+.primary{background:var(--accent);color:#fff}.danger{background:var(--danger);color:#a42626}
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat{padding:11px;border-radius:11px;background:#f7f9fa}.stat b{display:block;font-size:19px;margin-top:3px}
+.alert{padding:11px;border-radius:10px;margin-top:9px;background:var(--warn);font-size:13px}.ok{background:var(--ok)}
+.history{border-top:1px solid var(--line);padding:11px 0}.history:first-child{border-top:0}.date{font-weight:800}.small{font-size:12px;color:var(--muted);line-height:1.6}
+.tag{display:inline-block;background:#eef2f5;border-radius:20px;padding:4px 8px;margin:3px 3px 0 0;font-size:12px}
+.note{font-size:12px;color:var(--muted);line-height:1.6}
+@media(max-width:560px){.grid{grid-template-columns:1fr}.options{grid-template-columns:repeat(2,1fr)}.summary{grid-template-columns:1fr 1fr 1fr}}
+</style>
+</head>
+<body>
+<header><h1>からだの記録</h1><div class="sub">治療期間中の体調を毎日記録するシンプルな健康チェック</div></header>
+<main>
+<section class="card">
+<h2>今日の状態</h2>
+<div class="summary" id="summary"></div>
+<div id="treatmentDay" class="alert ok" style="margin-top:9px"></div>
+<div id="alerts"></div>
+</section>
+
+<section class="card">
+<h2>今日の記録</h2>
+<div class="grid">
+  <div class="field"><label>日付<input id="date" type="date"></label></div>
+  <div class="field"><label>体温（℃）<input id="temp" type="number" step="0.1" placeholder="36.5"></label></div>
+  <div class="field"><label>体重（kg）<input id="weight" type="number" step="0.1" placeholder="65.0"></label></div>
+  <div class="field"><label>脈拍（回/分）<input id="pulse" type="number" placeholder="測定した場合のみ"></label></div>
+</div>
+
+<div class="group">
+<div class="section-title">日常生活</div>
+<div class="options">
+<label class="opt"><input type="radio" name="daily" value="問題なく過ごせる" checked><span>問題なく<br>過ごせる</span></label>
+<label class="opt"><input type="radio" name="daily" value="歩行や軽い運動はできる"><span>歩行・軽い<br>運動はできる</span></label>
+<label class="opt"><input type="radio" name="daily" value="身の回りのことは何とかできる"><span>身の回りは<br>何とかできる</span></label>
+<label class="opt"><input type="radio" name="daily" value="半日以上を寝て過ごす"><span>半日以上<br>寝て過ごす</span></label>
+</div></div>
+
+<div class="group">
+<div class="section-title">食事量</div>
+<div class="options">
+<label class="opt"><input type="radio" name="food" value="普段と変わらず" checked><span>普段と<br>変わらず</span></label>
+<label class="opt"><input type="radio" name="food" value="少なめ"><span>少なめ</span></label>
+<label class="opt"><input type="radio" name="food" value="半分くらい"><span>半分くらい</span></label>
+<label class="opt"><input type="radio" name="food" value="ほとんど食べられない"><span>ほとんど<br>食べられない</span></label>
+</div></div>
+
+<div class="group">
+<div class="section-title">むかつき・吐き気</div>
+<div class="options">
+<label class="opt"><input type="radio" name="nausea" value="なし" checked><span>なし</span></label>
+<label class="opt"><input type="radio" name="nausea" value="吐き気はあるが食事はとれる"><span>吐き気あり<br>食事はとれる</span></label>
+<label class="opt"><input type="radio" name="nausea" value="吐き気のため食べる量が減った"><span>吐き気で<br>食事量↓</span></label>
+<label class="opt"><input type="radio" name="nausea" value="吐き気のため食事できない"><span>吐き気で<br>食事できない</span></label>
+</div>
+<label class="field" style="display:block;margin-top:8px">吐き気止めの使用（必要な場合）<input id="antiNausea" placeholder="薬名・回数など"></label>
+</div>
+
+<div class="group">
+<div class="section-title">嘔吐</div>
+<div class="grid">
+<div class="field"><label>1日に嘔吐した回数<input id="vomit" type="number" min="0" placeholder="0"></label></div>
+<div class="field"><label>口内炎<select id="mouth"><option>なし</option><option>あり</option></select></label></div>
+</div></div>
+
+<div class="group">
+<div class="section-title">下痢</div>
+<div class="grid">
+<div class="field"><label>下痢<select id="diarrhea"><option>なし</option><option>あり</option></select></label></div>
+<div class="field"><label>1日に下痢をした回数<input id="diarrheaCount" type="number" min="0" placeholder="0"></label></div>
+</div></div>
+
+<div class="group">
+<div class="section-title">便秘</div>
+<div class="options">
+<label class="opt"><input type="radio" name="constipation" value="なし" checked><span>なし</span></label>
+<label class="opt"><input type="radio" name="constipation" value="食事を工夫して排便"><span>食事を工夫して<br>排便</span></label>
+<label class="opt"><input type="radio" name="constipation" value="下剤を使用"><span>下剤を<br>使用</span></label>
+<label class="opt"><input type="radio" name="constipation" value="激しい腹痛を伴う便秘"><span>激しい腹痛を<br>伴う便秘</span></label>
+</div></div>
+
+<div class="group">
+<div class="section-title">しびれ・痛み</div>
+<div class="grid">
+<div class="field"><label>しびれ<select id="numbness"><option>なし</option><option>あり</option></select></label></div>
+<div class="field"><label>痛み<select id="pain"><option>なし</option><option>あるが動くのに問題なし</option><option>痛みで動かしにくい</option><option>痛みのため生活に支障あり</option></select></label></div>
+</div></div>
+
+<div class="group">
+<div class="section-title">服薬状況</div>
+<div class="note">今日飲んだ薬を記録します。マグミットは服用した錠数も記録できます。</div>
+<div class="grid" style="margin-top:8px">
+<div class="field"><label>マグミット（錠）<input id="medMagCount" type="number" min="0" step="1" placeholder="例 2"></label></div>
+<div class="field"><label>デカドロン<select id="medDecadron"><option>服用なし</option><option>予定どおり服用</option><option>一部飲み忘れ</option><option>追加服用</option></select></label></div>
+<div class="field"><label>メクトプラミド（吐き気）<select id="medMecTop"><option>服用なし</option><option>予定どおり服用</option><option>一部飲み忘れ</option><option>追加服用</option></select></label></div>
+<div class="field"><label>ロキソプロフェン（疼痛）<select id="medLoxoprofen"><option>服用なし</option><option>予定どおり服用</option><option>一部飲み忘れ</option><option>追加服用</option></select></label></div>
+<div class="field"><label>レバミピド（疼痛）<select id="medRebamipide"><option>服用なし</option><option>予定どおり服用</option><option>一部飲み忘れ</option><option>追加服用</option></select></label></div>
+</div>
+</div>
+
+<div class="group">
+<div class="section-title">フリーコメント</div>
+<textarea id="comment" rows="4" placeholder="皮膚の変化、味覚異常、寒気、だるさ、気になったことなど"></textarea>
+</div>
+
+<div class="actions">
+<button class="primary" onclick="saveRecord()">今日の記録を保存</button>
+<button onclick="loadLatest()">最新記録を呼び出す</button>
+<button onclick="exportCSV()">CSVを書き出す</button>
+</div>
+</section>
+
+<section class="card">
+<h2>治療情報</h2>
+<div class="grid">
+<div class="field"><label>治療サイクル<select id="cycle"><option>未設定</option><option>1回目</option><option>2回目</option><option>3回目</option><option>4回目</option><option>5回目</option><option>6回目</option></select></label></div>
+<div class="field"><label>治療日<input id="chemoDate" type="date"></label></div>
+</div>
+<p class="note">現在の登録内容：パクリタキセル＋カルボプラチン。治療方針が変更された場合はここを更新してください。<br>服薬記録：マグミット、デカドロン、メクトプラミド、ロキソプロフェン、レバミピド。</p>
+</section>
+
+<section class="card">
+<h2>過去の記録</h2>
+<div id="history"></div>
+<div class="actions"><button class="danger" onclick="clearRecords()">この端末の記録をすべて削除</button></div>
+</section>
+
+<section class="card note">
+<strong>医療上の注意</strong><br>
+このアプリは記録を整理するためのもので、診断や治療判断を行うものではありません。抗がん剤治療中に発熱、息苦しさ、意識の変化、強い・悪化する腹痛、繰り返す嘔吐、強いふらつきなどがある場合は、記録だけで判断せず、病院から指示されている連絡先へ相談してください。
+</section>
+</main>
+
+<script>
+const KEY="karadaDiaryV2";
+const $=id=>document.getElementById(id);
+function today(){return new Date().toISOString().slice(0,10)}
+$("date").value=today();
+function radio(name){return document.querySelector('input[name="'+name+'"]:checked')?.value||""}
+function val(id){return $(id).value}
+function saveRecord(){
+ const r={
+  date:val("date"),temp:val("temp"),weight:val("weight"),pulse:val("pulse"),
+  daily:radio("daily"),food:radio("food"),nausea:radio("nausea"),antiNausea:val("antiNausea"),
+  medMagCount:val("medMagCount"),medDecadron:val("medDecadron"),medMecTop:val("medMecTop"),medLoxoprofen:val("medLoxoprofen"),medRebamipide:val("medRebamipide"),
+  vomit:val("vomit"),mouth:val("mouth"),diarrhea:val("diarrhea"),diarrheaCount:val("diarrheaCount"),
+  constipation:radio("constipation"),numbness:val("numbness"),pain:val("pain"),comment:val("comment"),
+  cycle:val("cycle"),chemoDate:val("chemoDate")
+ };
+ let a=JSON.parse(localStorage.getItem(KEY)||"[]");
+ a=a.filter(x=>x.date!==r.date);a.unshift(r);a.sort((x,y)=>y.date.localeCompare(x.date));
+ localStorage.setItem(KEY,JSON.stringify(a));render();alert("保存しました。");
+}
+function fill(r){
+ Object.keys(r).forEach(k=>{if($(k))$(k).value=r[k]??""});
+ ["daily","food","nausea","constipation"].forEach(n=>{document.querySelectorAll('input[name="'+n+'"]').forEach(x=>x.checked=x.value===r[n])});
+}
+function loadLatest(){const a=get();if(a[0]){fill(a[0]);alert("最新の記録を呼び出しました。")}else alert("記録がありません。")}
+function get(){return JSON.parse(localStorage.getItem(KEY)||"[]")}
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+function render(){
+ const a=get(),r=a[0],sum=$("summary"),alerts=$("alerts"),history=$("history");
+ if(!r){sum.innerHTML='<div class="stat">記録なし</div>';alerts.innerHTML="";history.innerHTML='<div class="note">まだ記録がありません。</div>';return}
+ sum.innerHTML=
+ `<div class="stat"><span class="small">体重</span><b>${esc(r.weight)||"—"} kg</b></div>
+  <div class="stat"><span class="small">体温</span><b>${esc(r.temp)||"—"} ℃</b></div>
+  <div class="stat"><span class="small">脈拍</span><b>${esc(r.pulse)||"—"}</b></div>`;
+ const treatment=$("treatmentDay");
+ if(r.chemoDate){
+   const start=new Date(r.chemoDate+"T00:00:00"), now=new Date(r.date+"T00:00:00");
+   const diff=Math.floor((now-start)/86400000);
+   treatment.innerHTML=diff<0?"治療日前の記録":(diff===0?"💊 治療当日":`💊 治療日から ${diff}日目`);
+ } else treatment.innerHTML="治療日を設定すると「治療日から何日目か」を表示します。";
+ let w=[];
+ if(r.temp && Number(r.temp)>=38)w.push("体温が38℃以上です。病院からの指示に従ってください。");
+ if(Number(r.vomit)>=3)w.push("嘔吐が複数回あります。水分がとれない場合は早めに相談してください。");
+ if(r.diarrhea==="あり" && Number(r.diarrheaCount)>=3)w.push("下痢が複数回あります。脱水に注意してください。");
+ if(r.constipation==="激しい腹痛を伴う便秘")w.push("激しい腹痛を伴う便秘が記録されています。医療機関へ相談してください。");
+ if(r.food==="ほとんど食べられない" || r.nausea==="吐き気のため食事できない")w.push("食事がほとんど取れていません。水分摂取も含めて医療機関へ相談してください。");
+ alerts.innerHTML=w.length?w.map(x=>`<div class="alert">⚠ ${esc(x)}</div>`).join(""):'<div class="alert ok">大きな注意項目は自動検出されていません。</div>';
+ history.innerHTML=a.slice(0,14).map(r=>`
+ <div class="history">
+  <div class="date">${esc(r.date)} <span class="small">${esc(r.cycle||"")}</span></div>
+  <div>
+   ${r.weight?`<span class="tag">体重 ${esc(r.weight)}kg</span>`:""}
+   ${r.temp?`<span class="tag">体温 ${esc(r.temp)}℃</span>`:""}
+   ${r.pulse?`<span class="tag">脈拍 ${esc(r.pulse)}</span>`:""}
+   ${r.nausea&&r.nausea!=="なし"?`<span class="tag">吐き気あり</span>`:""}
+   ${r.medMagCount?`<span class="tag">マグミット ${esc(r.medMagCount)}錠</span>`:""}
+   ${r.medDecadron&&r.medDecadron!=="服用なし"?`<span class="tag">デカドロン</span>`:""}
+   ${r.medMecTop&&r.medMecTop!=="服用なし"?`<span class="tag">メクトプラミド</span>`:""}
+   ${r.medLoxoprofen&&r.medLoxoprofen!=="服用なし"?`<span class="tag">ロキソプロフェン</span>`:""}
+   ${r.medRebamipide&&r.medRebamipide!=="服用なし"?`<span class="tag">レバミピド</span>`:""}
+   ${r.vomit>0?`<span class="tag">嘔吐 ${esc(r.vomit)}回</span>`:""}
+   ${r.diarrhea==="あり"?`<span class="tag">下痢 ${esc(r.diarrheaCount||"")}回</span>`:""}
+   ${r.numbness==="あり"?`<span class="tag">しびれ</span>`:""}
+   ${r.pain!=="なし"?`<span class="tag">痛み</span>`:""}
+  </div>
+  ${r.comment?`<div class="small">メモ：${esc(r.comment)}</div>`:""}
+ </div>`).join("");
+}
+function exportCSV(){
+ const a=get();if(!a.length){alert("記録がありません。");return}
+ const headers=["日付","体温","体重","脈拍","日常生活","食事量","吐き気","吐き気止め","マグミット錠数","デカドロン","メクトプラミド","ロキソプロフェン","レバミピド","嘔吐回数","口内炎","下痢","下痢回数","便秘","しびれ","痛み","コメント","治療サイクル","治療日"];
+ const keys=["date","temp","weight","pulse","daily","food","nausea","antiNausea","medMagCount","medDecadron","medMecTop","medLoxoprofen","medRebamipide","vomit","mouth","diarrhea","diarrheaCount","constipation","numbness","pain","comment","cycle","chemoDate"];
+ const csv="\uFEFF"+[headers,...a.map(r=>keys.map(k=>`"${String(r[k]??"").replace(/"/g,'""')}"`))].map(x=>x.join(",")).join("\n");
+ const blob=new Blob([csv],{type:"text/csv;charset=utf-8"});
+ const url=URL.createObjectURL(blob),aTag=document.createElement("a");aTag.href=url;aTag.download="からだの記録.csv";aTag.click();URL.revokeObjectURL(url);
+}
+function clearRecords(){if(confirm("この端末に保存した記録をすべて削除します。よろしいですか？")){localStorage.removeItem(KEY);render()}}
+render();
+</script>
+<script>
+if ("serviceWorker" in navigator && location.protocol !== "file:") {
+  navigator.serviceWorker.register("./service-worker.js").catch(()=>{});
+}
+</script>
+</body>
+</html>
