@@ -1,0 +1,11 @@
+{
+  "name": "からだの記録",
+  "short_name": "からだの記録",
+  "description": "抗がん剤治療期間中の体調を毎日記録する健康チェックアプリ",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f3f6f8",
+  "theme_color": "#5b7c99",
+  "lang": "ja"
+}
